@@ -1,0 +1,105 @@
+Step 1 — Create (or check) your profile repository
+
+Your GitHub profile README only works if your repository name matches your GitHub username exactly.
+
+👉 Example:
+
+If your GitHub username is sandipsaw,
+then your repo name must be sandipsaw.
+
+✅ To create it:
+Go to https://github.com/new
+In Repository name, type your GitHub username (e.g., sandipsaw)
+Make sure it’s Public
+Tick ✅ “Add a README file”
+Click Create repository
+
+Step 2 — Create the GitHub Actions workflow
+Inside your repo, click Add file → Create new file
+Name the file exactly like this:
+
+.github/workflows/snake.yml
+(That means: a folder .github, inside it a folder workflows, and inside that, a file snake.yml)
+
+Paste this code inside:
+------------------------------------------------
+name: Generate snake animation
+
+on:
+  schedule: # execute every 12 hours
+    - cron: "* */12 * * *"
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  generate:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: generate snake.svg
+        uses: Platane/snk/svg-only@v3
+        with:
+          github_user_name: ${{ github.repository_owner }}
+          outputs: dist/snake.svg?palette=github-dark
+
+      - name: push snake.svg to the output branch
+        uses: crazy-max/ghaction-github-pages@v3.1.0
+        with:
+          target_branch: output
+          build_dir: dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+----------------------------------------------------------
+Scroll down and click Commit changes.
+
+Step 3 — Run the workflow manually
+Go to the Actions tab in your repository.
+Click on “Generate snake animation” (you’ll see it listed on the left).
+On the right side, click Run workflow → Run workflow.
+Wait 1–4 minutes until it finishes.
+You’ll know it’s successful when it shows ✅ Success (green check mark).
+
+Step 4 — Check for the generated snake
+Go to the Code tab of your repository.
+Click the branch dropdown (where it says main) → select output.
+You should see:
+
+dist/snake.svg
+That’s your animated contribution graph!
+
+Step 5 — Copy the raw link to the snake
+Open the file dist/snake.svg
+Click Raw
+Copy the link from your browser’s address bar —
+it will look like this:
+
+https://raw.githubusercontent.com/sandipsaw/sandipsaw/output/snake.svg
+
+Step 6 — Add it to your README
+Switch back to your main branch
+Edit your README.md
+Paste this code where you want the snake to appear:
+
+![GitHub Contribution Snake](https://raw.githubusercontent.com/sandipsaw/sandipsaw/output/snake.svg)
+
+Step 7 — See it live!
+Go to your GitHub profile page:
+👉 https://github.com/sandipsaw
+You’ll now see the snake moving across your contribution graph 🐍💚
+
+(Optional) Step 8 — Make it look perfect in both dark & light themes
+Replace the Markdown in your README with this HTML code:
+
+------------------------------------------------------------------------
+<picture>
+  <source srcset="https://raw.githubusercontent.com/sandipsaw/sandipsaw/output/snake.svg?palette=github-dark" media="(prefers-color-scheme: dark)">
+  <img alt="GitHub Contribution Snake" src="https://raw.githubusercontent.com/sandipsaw/sandipsaw/output/snake.svg">
+</picture>
+------------------------------------------------------------------------
+Now, users in dark mode will see the dark snake 🐍,
+and those in light mode will see the light one 🐍✨
